@@ -180,6 +180,14 @@ body {
   color: var(--muted);
 }
 
+.signup-note {
+  padding: 12px 14px;
+  border: 1px solid rgba(31, 122, 79, 0.16);
+  border-radius: 14px;
+  background: rgba(31, 122, 79, 0.08);
+  font-size: 0.95rem;
+}
+
 .auth-form label {
   margin-top: 6px;
   font-size: 0.95rem;

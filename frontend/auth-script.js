@@ -3,7 +3,6 @@ const forms = document.querySelectorAll(".auth-form");
 const statusMessage = document.getElementById("status-message");
 const roleButtons = document.querySelectorAll(".role-button");
 const loginRoleInput = document.getElementById("login-role");
-const signupRoleInput = document.getElementById("signup-role");
 const loginTitle = document.getElementById("login-title");
 const loginCopy = document.getElementById("login-copy");
 const signupTitle = document.getElementById("signup-title");
@@ -25,14 +24,10 @@ const roleContent = {
   worker: {
     loginTitle: "Worker login",
     loginCopy: "Sign in to manage assigned pickups and update field status.",
-    signupTitle: "Create worker account",
-    signupCopy: "Register as a worker to receive route and collection assignments."
   },
   admin: {
     loginTitle: "Admin login",
     loginCopy: "Sign in to supervise requests, workers, and cleanup operations.",
-    signupTitle: "Create admin account",
-    signupCopy: "Create an admin account to manage city-wide waste operations."
   }
 };
 
@@ -56,7 +51,7 @@ const setStatus = (message, type) => {
 
 const syncHistory = () => {
   const url = new URL(window.location.href);
-  url.pathname = `/${activeTab}/${activeRole}`;
+  url.pathname = activeTab === "signup" ? "/register/user" : `/login/${activeRole}`;
   url.search = "";
   url.hash = activeTab === "signup" ? "#signup-form" : "";
   window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
@@ -86,10 +81,6 @@ const syncRoleUI = (role) => {
     loginRoleInput.value = selectedRole;
   }
 
-  if (signupRoleInput) {
-    signupRoleInput.value = selectedRole;
-  }
-
   if (loginTitle) {
     loginTitle.textContent = roleContent[selectedRole].loginTitle;
   }
@@ -99,11 +90,11 @@ const syncRoleUI = (role) => {
   }
 
   if (signupTitle) {
-    signupTitle.textContent = roleContent[selectedRole].signupTitle;
+    signupTitle.textContent = roleContent.user.signupTitle;
   }
 
   if (signupCopy) {
-    signupCopy.textContent = roleContent[selectedRole].signupCopy;
+    signupCopy.textContent = roleContent.user.signupCopy;
   }
 
   syncHistory();
@@ -191,9 +182,9 @@ document.getElementById("signup-form").addEventListener("submit", async (event) 
 
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    setStatus(`${roleContent[activeRole].signupTitle} created successfully. You can log in now.`, "success");
+    setStatus("User account created successfully. You can log in now.", "success");
     form.reset();
-    syncRoleUI(activeRole);
+    syncRoleUI("user");
     activateTab("login");
   } catch (error) {
     setStatus(error.message, "error");

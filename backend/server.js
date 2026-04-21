@@ -21,7 +21,6 @@ app.use(cors({
 }));
 const PORT = process.env.PORT || 5000;
 let isDatabaseReady = false;
-const allowedRoles = new Set(["user", "worker", "admin"]);
 const normalizeRole = (role) => {
   if (!role) {
     return "user";
@@ -52,17 +51,10 @@ const requireDatabase = (req, res, next) => {
 //Pending task: 1.input validation 2.verfied registration
 app.post("/auth/register", requireDatabase, async (req, res) => {
   const { name, email, password } = req.body;
-  const normalizedRole = normalizeRole(req.body.role);
 
   if (!name || !email || !password) {
     return res.status(400).json({
       msg: "All fields are required"
-    });
-  }
-
-  if (!allowedRoles.has(normalizedRole)) {
-    return res.status(400).json({
-      msg: "Invalid role selected"
     });
   }
 
@@ -83,7 +75,7 @@ app.post("/auth/register", requireDatabase, async (req, res) => {
       name,
       email: normalizedEmail,
       password: hashedPassword,
-      role: normalizedRole
+      role: "user"
     });
 
     res.status(201).json({
