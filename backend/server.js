@@ -10,6 +10,13 @@ const {auth}=require("./auth");
 
 dotenv.config({ path: path.join(__dirname, ".env") });
 
+const cors = require("cors");
+
+app.use(cors({
+  origin: "https://waste-managmen-lpu.vercel.app/", // 👈 YOUR VERCEL URL
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 const app = express();
 const PORT = process.env.PORT || 5000;
 let isDatabaseReady = false;
