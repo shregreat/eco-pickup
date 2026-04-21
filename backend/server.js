@@ -13,8 +13,9 @@ dotenv.config({ path: path.join(__dirname, ".env") });
 const cors = require("cors");
 
 const app = express();
+
 app.use(cors({
-  origin: "https://waste-managmen-lpu.vercel.app/", // 👈 YOUR VERCEL URL
+  origin: "https://waste-managmen-lpu.vercel.app", // ✅ no trailing slash
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
