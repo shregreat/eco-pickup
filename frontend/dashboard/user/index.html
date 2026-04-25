@@ -14,7 +14,7 @@
   </head>
   <body data-role="user">
     <div class="dashboard-shell">
-      <aside class="dashboard-sidebar">
+      <header class="dashboard-navbar">
         <a class="dashboard-brand" href="/" aria-label="EcoPickup home">
           <span class="dashboard-brand-mark">E</span>
           <div>
@@ -28,12 +28,7 @@
           <a href="/requests/my/">My Requests</a>
           <button class="dashboard-logout" id="dashboard-logout" type="button">Logout</button>
         </nav>
-
-        <div class="sidebar-note">
-          <h3>Resident Access</h3>
-          <p>Check your pickup progress, reward points, and recent cleanup activity without leaving the portal.</p>
-        </div>
-      </aside>
+      </header>
 
       <main class="dashboard-main">
         <header class="dashboard-topbar" id="dashboard">
@@ -80,74 +75,61 @@
           </article>
         </section>
 
-        <section class="dashboard-section content-grid">
+        <!-- New Horizontal Section for Actions -->
+        <section class="dashboard-section content-grid-3">
           <article class="card" id="new-request">
             <div class="section-heading">
               <div>
                 <h2>Create New Request</h2>
-                <p>Open the dedicated request page to submit a pickup or garbage report with your account.</p>
               </div>
             </div>
-            <div class="status-list">
+            <div class="status-list" style="margin-bottom: 16px;">
               <article>
-                <strong>Submit from a separate page</strong>
-                <span>Use the dedicated form page to create a new pickup or garbage report.</span>
-              </article>
-              <article>
-                <strong>Track on a separate page</strong>
-                <span>Open your request history page to view all submissions from your account.</span>
+                <strong>Submit Pickup</strong>
+                <span>Create a new pickup or garbage report.</span>
               </article>
             </div>
-            <div class="dashboard-action-row">
-              <a class="dashboard-submit-button" href="/requests/new/">Open New Request Page</a>
-              <a class="dashboard-secondary-button" href="/requests/my/">Open My Requests Page</a>
-            </div>
+            <a class="dashboard-submit-button" href="/requests/new/" style="width: 100%;">Create Request</a>
           </article>
 
           <article class="card" id="schedule">
             <div class="section-heading">
               <div>
                 <h2>Pickup Schedule</h2>
-                <p>Your next waste collection windows.</p>
               </div>
             </div>
             <div class="status-list">
               <article>
                 <strong>General waste</strong>
-                <span>Tuesday and Friday between 5:00 PM and 7:00 PM.</span>
+                <span>Tuesday and Friday, 5:00 PM - 7:00 PM.</span>
               </article>
               <article>
                 <strong>Dry recyclables</strong>
-                <span>Saturday morning collection in your apartment block.</span>
-              </article>
-              <article>
-                <strong>Special pickup</strong>
-                <span>Book bulky items at least 24 hours before collection.</span>
+                <span>Saturday morning collection.</span>
               </article>
             </div>
           </article>
-        </section>
 
-        <section class="dashboard-section">
           <article class="card" id="requests">
             <div class="section-heading">
               <div>
                 <h2>My Requests</h2>
-                <p>Use the separate request history page to view everything fetched through your backend API.</p>
               </div>
             </div>
-            <div class="empty-note">
-              Request history has been moved to its own page so the overview dashboard stays cleaner and easier to use.
+            <div class="status-list" style="margin-bottom: 16px;">
+              <article>
+                <strong>Track Status</strong>
+                <span>View history and track active requests.</span>
+              </article>
             </div>
-            <div class="dashboard-action-row">
-              <a class="dashboard-secondary-button" href="/requests/my/">Go To My Requests</a>
-            </div>
+            <a class="dashboard-secondary-button" href="/requests/my/" style="width: 100%;">View History</a>
           </article>
         </section>
 
         <section class="dashboard-section analytics-grid">
-          <article class="card" id="rewards">
-            <span class="card-eyebrow">Rewards</span>
+          <!-- Full Width Rewards Section -->
+          <article class="card full-section" id="rewards">
+            <span class="card-eyebrow">Rewards Program</span>
             <h3>Monthly points growth</h3>
             <div class="chart-bars">
               <article><span style="height: 34%"></span><small>Jan</small></article>
@@ -156,28 +138,44 @@
               <article><span style="height: 82%"></span><small>Apr</small></article>
             </div>
           </article>
-          <article class="card" id="activity">
+
+          <article class="card full-section" id="activity">
             <span class="card-eyebrow">Recent Activity</span>
-            <h3>Updates from your area</h3>
-            <div class="activity-list">
-              <article>
-                <strong>Pickup confirmed</strong>
-                <p>Your scheduled collection for Green Avenue was accepted by the route team.</p>
-              </article>
-              <article>
-                <strong>Rewards credited</strong>
-                <p>40 points were added after your recycling submission was processed.</p>
-              </article>
-              <article>
-                <strong>Area alert closed</strong>
-                <p>The garbage hotspot you reported on Market Road has been cleaned.</p>
-              </article>
-            </div>
+            <h3>Your recent requests</h3>
+            <table class="table-shell" style="margin-top: 16px;">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Location</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="user-recent-activity-body">
+                <tr><td colspan="3">Loading...</td></tr>
+              </tbody>
+            </table>
+          </article>
+          <article class="card full-section" id="leaderboard">
+            <span class="card-eyebrow">Community</span>
+            <h3>Top Eco-Citizens</h3>
+            <table class="table-shell" style="margin-top: 16px;">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Citizen Name</th>
+                  <th>Eco Points</th>
+                </tr>
+              </thead>
+              <tbody id="user-leaderboard-body">
+                <tr><td colspan="3">Loading leaderboard...</td></tr>
+              </tbody>
+            </table>
           </article>
         </section>
       </main>
     </div>
 
+    <script src="/socket.io/socket.io.js"></script>
     <script src="/dashboard-script.js"></script>
   </body>
 </html>

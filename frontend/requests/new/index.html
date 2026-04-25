@@ -14,7 +14,7 @@
   </head>
   <body data-role="user" data-page="new-request">
     <div class="dashboard-shell">
-      <aside class="dashboard-sidebar">
+      <header class="dashboard-navbar">
         <a class="dashboard-brand" href="/" aria-label="EcoPickup home">
           <span class="dashboard-brand-mark">E</span>
           <div>
@@ -28,12 +28,7 @@
           <a href="/requests/my/">My Requests</a>
           <button class="dashboard-logout" id="dashboard-logout" type="button">Logout</button>
         </nav>
-
-        <div class="sidebar-note">
-          <h3>Resident Access</h3>
-          <p>Check your pickup progress, reward points, and recent cleanup activity without leaving the portal.</p>
-        </div>
-      </aside>
+      </header>
 
       <main class="dashboard-main">
         <header class="dashboard-topbar">
@@ -73,20 +68,26 @@
               />
 
               <label for="request-location">Location</label>
-              <input
-                id="request-location"
-                name="location"
-                type="text"
-                placeholder="Enter the area, street, or landmark"
-                required
-              />
+              <div style="display: flex; gap: 8px;">
+                <input
+                  id="request-location"
+                  name="location"
+                  type="text"
+                  placeholder="Enter the area, street, or landmark"
+                  required
+                  style="flex: 1;"
+                />
+                <button type="button" id="get-location-btn" class="dashboard-secondary-button" style="padding: 0 16px; font-size: 14px;" title="Use GPS Location">
+                  📍 Get GPS
+                </button>
+              </div>
 
-              <label for="request-image-url">Image URL (optional)</label>
+              <label for="request-image">Upload Image (Optional)</label>
               <input
-                id="request-image-url"
-                name="imageUrl"
-                type="url"
-                placeholder="https://example.com/photo.jpg"
+                id="request-image"
+                name="image"
+                type="file"
+                accept="image/*"
               />
 
               <div class="dashboard-action-row">

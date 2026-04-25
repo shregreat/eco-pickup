@@ -14,7 +14,7 @@
   </head>
   <body data-role="user" data-page="my-requests">
     <div class="dashboard-shell">
-      <aside class="dashboard-sidebar">
+      <header class="dashboard-navbar">
         <a class="dashboard-brand" href="/" aria-label="EcoPickup home">
           <span class="dashboard-brand-mark">E</span>
           <div>
@@ -28,12 +28,7 @@
           <a class="active" href="/requests/my/">My Requests</a>
           <button class="dashboard-logout" id="dashboard-logout" type="button">Logout</button>
         </nav>
-
-        <div class="sidebar-note">
-          <h3>Resident Access</h3>
-          <p>Check your pickup progress, reward points, and recent cleanup activity without leaving the portal.</p>
-        </div>
-      </aside>
+      </header>
 
       <main class="dashboard-main">
         <header class="dashboard-topbar">
@@ -69,11 +64,12 @@
                   <th>Request Type</th>
                   <th>Status</th>
                   <th>Created</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody id="user-requests-table-body">
                 <tr>
-                  <td colspan="4">Loading your requests...</td>
+                  <td colspan="5">Loading your requests...</td>
                 </tr>
               </tbody>
             </table>
@@ -82,6 +78,30 @@
           </article>
         </section>
       </main>
+    </div>
+
+    <!-- Rating Modal -->
+    <div id="rating-modal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+      <article class="card" style="width: 100%; max-width: 400px; margin: 20px;">
+        <div class="section-heading">
+          <div>
+            <h2>Rate Worker</h2>
+            <p>How was the pickup service?</p>
+          </div>
+        </div>
+        <div id="rating-stars" style="display: flex; gap: 8px; margin: 16px 0; font-size: 24px; cursor: pointer;">
+          <span data-value="1">☆</span>
+          <span data-value="2">☆</span>
+          <span data-value="3">☆</span>
+          <span data-value="4">☆</span>
+          <span data-value="5">☆</span>
+        </div>
+        <p id="rating-status" class="form-status"></p>
+        <div style="display: flex; gap: 12px; margin-top: 16px;">
+          <button id="cancel-rating-btn" class="dashboard-secondary-button" style="flex: 1;">Cancel</button>
+          <button id="submit-rating-btn" class="dashboard-submit-button" style="flex: 1;" disabled>Submit</button>
+        </div>
+      </article>
     </div>
 
     <script src="/request-pages.js"></script>

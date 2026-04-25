@@ -10,7 +10,19 @@ const pageStatusMessage = document.getElementById("page-status-message");
 const newRequestForm = document.getElementById("new-request-form");
 const userRequestsTableBody = document.getElementById("user-requests-table-body");
 const adminRequestsTableBody = document.getElementById("admin-requests-table-body");
-const API_BASE_URL = "https://waste-managment-39g8.onrender.com";
+const API_BASE_URL = window.location.hostname === "localhost" ? "http://localhost:5000" : "https://waste-managment-39g8.onrender.com";
+
+let socket = null;
+if (typeof io !== "undefined") {
+  socket = io(API_BASE_URL);
+  socket.on("notification", (data) => {
+    if (pageUser && data.userId === pageUser.id) {
+      alert("🔔 " + data.message);
+      if (pageType === "my-requests") loadMyRequestsPage();
+      if (pageType === "admin-requests") loadAdminRequestsPage();
+    }
+  });
+}
 
 const pageRoutes = {
   user: "/dashboard/user/",
@@ -120,6 +132,40 @@ if (pageLogoutButton) {
   });
 }
 
+window.assignWorker = async (requestId) => {
+  const workerSelect = document.getElementById(`worker-select-${requestId}`);
+  if (!workerSelect) return;
+
+  const workerId = workerSelect.value;
+  if (!workerId) {
+    setPageStatus("Please select a worker first.", "error");
+    return;
+  }
+
+  const token = getStoredToken();
+  if (!token) return;
+
+  try {
+    setPageStatus("Assigning worker...");
+    const response = await fetch(`${API_BASE_URL}/api/admin/requests/${requestId}/assign`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ workerId })
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "Failed to assign worker");
+
+    setPageStatus("Worker assigned successfully!", "success");
+    loadAdminRequestsPage(); // Refresh table
+  } catch (error) {
+    setPageStatus(error.message, "error");
+  }
+};
+
 const loadMyRequestsPage = async () => {
   if (pageType !== "my-requests" || !userRequestsTableBody) {
     return;
@@ -160,7 +206,7 @@ const loadMyRequestsPage = async () => {
     if (requests.length === 0) {
       userRequestsTableBody.innerHTML = `
         <tr>
-          <td colspan="4">No requests found for this account yet.</td>
+          <td colspan="5">No requests found for this account yet.</td>
         </tr>
       `;
       setPageStatus("No requests found yet.", "success");
@@ -168,14 +214,26 @@ const loadMyRequestsPage = async () => {
     }
 
     userRequestsTableBody.innerHTML = requests
-      .map((request) => `
-        <tr>
-          <td>${escapeHtml(formatRequestId(request._id))}</td>
-          <td>${escapeHtml(request.description || request.location || "Request")}</td>
-          <td><span class="status-pill ${getStatusTone(request.status)}">${escapeHtml(request.status || "Pending")}</span></td>
-          <td>${escapeHtml(formatRequestDate(request.createdAt))}</td>
-        </tr>
-      `)
+      .map((request) => {
+        let actionBtn = '--';
+        if (request.status === 'Completed') {
+          if (request.userRating) {
+            actionBtn = `<span style="color: var(--dash-muted); font-size: 12px;">Rated ${request.userRating}/5</span>`;
+          } else {
+            actionBtn = `<button onclick="window.openRatingModal('${request._id}')" class="primary-button" style="padding: 4px 8px; font-size: 12px;">Rate Worker</button>`;
+          }
+        }
+
+        return `
+          <tr>
+            <td>${escapeHtml(formatRequestId(request._id))}</td>
+            <td>${escapeHtml(request.description || request.location || "Request")}</td>
+            <td><span class="status-pill ${getStatusTone(request.status)}">${escapeHtml(request.status || "Pending")}</span></td>
+            <td>${escapeHtml(formatRequestDate(request.createdAt))}</td>
+            <td>${actionBtn}</td>
+          </tr>
+        `;
+      })
       .join("");
 
     setPageStatus(`Loaded ${requests.length} request(s).`, "success");
@@ -208,19 +266,19 @@ const loadAdminRequestsPage = async () => {
   try {
     setPageStatus("Loading all requests for admin review...");
 
-    const response = await fetch(`${API_BASE_URL}/api/requests`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const [requestsResponse, workersResponse] = await Promise.all([
+      fetch(`${API_BASE_URL}/api/requests`, { headers: { Authorization: `Bearer ${token}` } }),
+      fetch(`${API_BASE_URL}/api/admin/workers`, { headers: { Authorization: `Bearer ${token}` } })
+    ]);
 
-    const data = await response.json();
+    const data = await requestsResponse.json();
+    const workers = await workersResponse.json();
 
-    if (handleUnauthorizedResponse(response)) {
+    if (handleUnauthorizedResponse(requestsResponse)) {
       return;
     }
 
-    if (!response.ok) {
+    if (!requestsResponse.ok) {
       throw new Error(data.msg || data.message || "Unable to load admin requests");
     }
 
@@ -229,12 +287,14 @@ const loadAdminRequestsPage = async () => {
     if (requests.length === 0) {
       adminRequestsTableBody.innerHTML = `
         <tr>
-          <td colspan="5">No requests are available yet.</td>
+          <td colspan="6">No requests are available yet.</td>
         </tr>
       `;
       setPageStatus("No requests available.", "success");
       return;
     }
+
+    const workerOptions = workers.map(w => `<option value="${w._id}">${escapeHtml(w.name)} (${w.availability || 'Offline'})</option>`).join("");
 
     adminRequestsTableBody.innerHTML = requests
       .map((request) => `
@@ -243,7 +303,16 @@ const loadAdminRequestsPage = async () => {
           <td>${escapeHtml(request.description || "--")}</td>
           <td>${escapeHtml(request.location || "--")}</td>
           <td><span class="status-pill ${getStatusTone(request.status)}">${escapeHtml(request.status || "Pending")}</span></td>
-          <td>${escapeHtml(request.assignedWorker || "Unassigned")}</td>
+          <td>${escapeHtml(request.assignedWorker ? "Assigned" : "Unassigned")}</td>
+          <td>
+            ${request.status === "Pending" ? `
+              <select id="worker-select-${request._id}" class="dashboard-input" style="padding: 4px; width: 120px; font-size: 12px; margin-right: 5px;">
+                <option value="">Select Worker</option>
+                ${workerOptions}
+              </select>
+              <button onclick="window.assignWorker('${request._id}')" class="primary-button" style="padding: 4px 8px; font-size: 12px;">Assign</button>
+            ` : `<span style="color: var(--text-muted); font-size: 12px;">N/A</span>`}
+          </td>
         </tr>
       `)
       .join("");
@@ -259,6 +328,36 @@ const loadAdminRequestsPage = async () => {
   }
 };
 
+const getLocationBtn = document.getElementById("get-location-btn");
+if (getLocationBtn) {
+  getLocationBtn.addEventListener("click", () => {
+    if ("geolocation" in navigator) {
+      getLocationBtn.textContent = "Locating...";
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+            // Reverse Geocode using simple Nominatim API
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+            const data = await response.json();
+            document.getElementById("request-location").value = data.display_name || `${latitude}, ${longitude}`;
+            getLocationBtn.textContent = "📍 Get GPS";
+          } catch (err) {
+            document.getElementById("request-location").value = `${position.coords.latitude}, ${position.coords.longitude}`;
+            getLocationBtn.textContent = "📍 Get GPS";
+          }
+        },
+        (error) => {
+          alert("Unable to retrieve your location.");
+          getLocationBtn.textContent = "📍 Get GPS";
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by your browser");
+    }
+  });
+}
+
 if (newRequestForm) {
   newRequestForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -272,13 +371,9 @@ if (newRequestForm) {
     }
 
     const formData = new FormData(newRequestForm);
-    const payload = {
-      description: String(formData.get("description") || "").trim(),
-      location: String(formData.get("location") || "").trim(),
-      imageUrl: String(formData.get("imageUrl") || "").trim()
-    };
-
-    if (!payload.description || !payload.location) {
+    
+    // Validate Description and Location
+    if (!formData.get("description") || !formData.get("location")) {
       setPageStatus("Description and location are required.", "error");
       return;
     }
@@ -289,10 +384,9 @@ if (newRequestForm) {
       const response = await fetch(`${API_BASE_URL}/api/requests`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}` // Let browser set Content-Type for FormData boundary
         },
-        body: JSON.stringify(payload)
+        body: formData
       });
 
       const data = await response.json();
@@ -315,3 +409,94 @@ if (newRequestForm) {
 
 loadMyRequestsPage();
 loadAdminRequestsPage();
+
+// --- Rating System Logic ---
+let currentRatingRequestId = null;
+let currentRatingValue = 0;
+
+window.openRatingModal = (requestId) => {
+  currentRatingRequestId = requestId;
+  currentRatingValue = 0;
+  
+  const modal = document.getElementById("rating-modal");
+  const statusEl = document.getElementById("rating-status");
+  const submitBtn = document.getElementById("submit-rating-btn");
+  
+  if (modal) modal.style.display = "flex";
+  if (statusEl) statusEl.textContent = "";
+  if (submitBtn) submitBtn.disabled = true;
+  
+  // Reset stars
+  document.querySelectorAll("#rating-stars span").forEach(star => {
+    star.style.color = "var(--dash-muted)";
+  });
+};
+
+const closeRatingModal = () => {
+  currentRatingRequestId = null;
+  const modal = document.getElementById("rating-modal");
+  if (modal) modal.style.display = "none";
+};
+
+// Setup Event Listeners for Rating Modal
+const cancelRatingBtn = document.getElementById("cancel-rating-btn");
+if (cancelRatingBtn) {
+  cancelRatingBtn.addEventListener("click", closeRatingModal);
+}
+
+const ratingStars = document.querySelectorAll("#rating-stars span");
+ratingStars.forEach(star => {
+  star.addEventListener("click", (e) => {
+    currentRatingValue = parseInt(e.target.dataset.value);
+    
+    // Highlight stars
+    ratingStars.forEach(s => {
+      if (parseInt(s.dataset.value) <= currentRatingValue) {
+        s.style.color = "#fbbf24"; // yellow/gold
+      } else {
+        s.style.color = "var(--dash-muted)";
+      }
+    });
+    
+    document.getElementById("submit-rating-btn").disabled = false;
+  });
+});
+
+const submitRatingBtn = document.getElementById("submit-rating-btn");
+if (submitRatingBtn) {
+  submitRatingBtn.addEventListener("click", async () => {
+    if (!currentRatingRequestId || currentRatingValue === 0) return;
+    
+    const token = getStoredToken();
+    const statusEl = document.getElementById("rating-status");
+    
+    try {
+      if (statusEl) {
+        statusEl.textContent = "Submitting rating...";
+        statusEl.className = "form-status";
+      }
+      submitRatingBtn.disabled = true;
+      
+      const response = await fetch(`${API_BASE_URL}/api/requests/${currentRatingRequestId}/rate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ rating: currentRatingValue })
+      });
+      
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.msg || "Failed to submit rating");
+      
+      closeRatingModal();
+      loadMyRequestsPage(); // Refresh table
+    } catch (err) {
+      if (statusEl) {
+        statusEl.textContent = err.message;
+        statusEl.className = "form-status error";
+      }
+      submitRatingBtn.disabled = false;
+    }
+  });
+}

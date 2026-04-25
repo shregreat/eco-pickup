@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Email - EcoPickup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #059669;
+            --primary-hover: #047857;
+            --secondary: #10b981;
+            --dark: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        .split-layout { display: flex; width: 100%; min-height: 100vh; }
+
+        .hero-side {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary);
+            overflow: hidden;
+            display: none;
+        }
+
+        @media (min-width: 900px) { .hero-side { display: flex; } }
+
+        .hero-side::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(5, 150, 105, 0.4), rgba(4, 120, 87, 0.8));
+            z-index: 1;
+        }
+
+        .hero-img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            color: white;
+            text-align: center;
+            padding: 40px;
+            max-width: 600px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .hero-content h1 { font-size: 3.5rem; margin-bottom: 20px; font-weight: 700; text-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .hero-content p { font-size: 1.2rem; opacity: 0.9; line-height: 1.6; }
+
+        .action-side {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .blob-1 {
+            position: absolute; top: -100px; right: -100px; width: 300px; height: 300px; border-radius: 50%;
+            background: var(--secondary); filter: blur(80px); opacity: 0.4; z-index: 0; animation: float 8s ease-in-out infinite;
+        }
+
+        .blob-2 {
+            position: absolute; bottom: -50px; left: -50px; width: 250px; height: 250px; border-radius: 50%;
+            background: #34d399; filter: blur(60px); opacity: 0.3; z-index: 0; animation: float 10s ease-in-out infinite reverse;
+        }
+
+        .glass-card {
+            background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border);
+            border-radius: 24px; padding: 50px 40px; max-width: 480px; width: 100%; text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1); z-index: 10;
+            transform: translateY(20px); opacity: 0; animation: slideUp 0.6s ease-out forwards;
+        }
+
+        .icon-container {
+            width: 100px; height: 100px; background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .icon-container.loading { animation: pulse 2s infinite; }
+        .icon-container.success { background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 10px 25px rgba(34, 197, 94, 0.4); }
+        .icon-container.error { background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4); }
+
+        .icon-container span { font-size: 45px; }
+
+        .glass-card h2 { font-size: 2rem; color: var(--dark); margin-bottom: 15px; font-weight: 700; }
+        .glass-card p { color: #475569; font-size: 1.1rem; line-height: 1.6; margin-bottom: 35px; }
+
+        .primary-button {
+            display: inline-flex; align-items: center; justify-content: center; width: 100%; padding: 16px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary)); color: white; text-decoration: none;
+            border-radius: 12px; font-weight: 600; font-size: 1.1rem; transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(5, 150, 105, 0.3); border: none; cursor: pointer;
+        }
+
+        .primary-button:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(5, 150, 105, 0.4); }
+
+        @keyframes float { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-20px) scale(1.05); } }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); } 70% { box-shadow: 0 0 0 25px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+        @keyframes slideUp { to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="split-layout">
+        <div class="hero-side">
+            <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=1000&auto=format&fit=crop" alt="Eco-friendly environment" class="hero-img">
+            <div class="hero-content">
+                <h1>Welcome to EcoPickup.</h1>
+                <p>Join thousands of residents making our city cleaner, greener, and more sustainable every single day.</p>
+            </div>
+        </div>
+
+        <div class="action-side">
+            <div class="blob-1"></div>
+            <div class="blob-2"></div>
+            
+            <div class="glass-card" id="verify-content">
+                <div class="icon-container loading">
+                    <span>⏳</span>
+                </div>
+                <h2>Verifying...</h2>
+                <p>Please wait while we magically verify your account.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            const verifyContent = document.getElementById('verify-content');
+            const API_BASE_URL = window.location.hostname === "localhost" ? "http://localhost:5000" : "https://waste-managment-39g8.onrender.com";
+
+            if (!token) {
+                verifyContent.innerHTML = `
+                    <div class="icon-container error"><span>❌</span></div>
+                    <h2>Invalid Link</h2>
+                    <p>No verification token found. Please check your email link.</p>
+                    <a href="/login.html" class="primary-button">Return to Login</a>
+                `;
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/verify-email/${token}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    verifyContent.innerHTML = `
+                        <div class="icon-container success"><span>✅</span></div>
+                        <h2>Email Verified!</h2>
+                        <p>${data.msg}</p>
+                        <a href="/login.html" class="primary-button">Proceed to Login</a>
+                    `;
+                } else {
+                    verifyContent.innerHTML = `
+                        <div class="icon-container error"><span>❌</span></div>
+                        <h2>Verification Failed</h2>
+                        <p>${data.msg}</p>
+                        <a href="/login.html" class="primary-button">Return to Login</a>
+                    `;
+                }
+            } catch (error) {
+                verifyContent.innerHTML = `
+                    <div class="icon-container error"><span>❌</span></div>
+                    <h2>Connection Error</h2>
+                    <p>Could not connect to the server. Please try again later.</p>
+                    <a href="/login.html" class="primary-button">Return to Login</a>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

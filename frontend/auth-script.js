@@ -8,7 +8,7 @@ const loginCopy = document.getElementById("login-copy");
 const signupTitle = document.getElementById("signup-title");
 const signupCopy = document.getElementById("signup-copy");
 const signupTabButton = document.querySelector('.tab-button[data-tab="signup"]');
-const API_BASE_URL = "https://waste-managment-39g8.onrender.com";
+const API_BASE_URL = window.location.hostname === "localhost" ? "http://localhost:5000" : "https://waste-managment-39g8.onrender.com";
 const dashboardRoutes = {
   user: "/dashboard/user/",
   worker: "/dashboard/worker/",
@@ -198,10 +198,11 @@ document.getElementById("signup-form").addEventListener("submit", async (event) 
 
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    setStatus("User account created successfully. You can log in now.", "success");
+    setStatus("User account created successfully. Redirecting...", "success");
     form.reset();
-    syncRoleUI("user");
-    activateTab("login");
+    
+    // Redirect to the check-email page
+    window.location.replace("/check-email.html");
   } catch (error) {
     setStatus(error.message, "error");
   }

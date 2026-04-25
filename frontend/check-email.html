@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Your Email - EcoPickup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #059669;
+            --primary-hover: #047857;
+            --secondary: #10b981;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* Split Screen Layout */
+        .split-layout {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* Left Side: Illustration / Video */
+        .hero-side {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary);
+            overflow: hidden;
+            display: none; /* Mobile hidden */
+        }
+
+        @media (min-width: 900px) {
+            .hero-side {
+                display: flex;
+            }
+        }
+
+        .hero-side::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(5, 150, 105, 0.4), rgba(4, 120, 87, 0.8));
+            z-index: 1;
+        }
+
+        .hero-img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            color: white;
+            text-align: center;
+            padding: 40px;
+            max-width: 600px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        /* Right Side: Action Card */
+        .action-side {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Decorative background blobs */
+        .blob-1 {
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: var(--secondary);
+            filter: blur(80px);
+            opacity: 0.4;
+            z-index: 0;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .blob-2 {
+            position: absolute;
+            bottom: -50px;
+            left: -50px;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: #34d399;
+            filter: blur(60px);
+            opacity: 0.3;
+            z-index: 0;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 50px 40px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUp 0.6s ease-out forwards;
+        }
+
+        .icon-container {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        .icon-container svg {
+            width: 50px;
+            height: 50px;
+            color: white;
+            animation: bounce 2s infinite;
+        }
+
+        .glass-card h2 {
+            font-size: 2rem;
+            color: var(--dark);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .glass-card p {
+            color: #475569;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 35px;
+        }
+
+        .primary-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(5, 150, 105, 0.3);
+            border: none;
+            cursor: pointer;
+        }
+
+        .primary-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(5, 150, 105, 0.4);
+        }
+
+        .help-text {
+            margin-top: 25px;
+            font-size: 0.95rem;
+            color: #64748b;
+        }
+
+        .help-text a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .help-text a:hover {
+            color: var(--primary-hover);
+            text-decoration: underline;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+            70% { box-shadow: 0 0 0 25px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        @keyframes slideUp {
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="split-layout">
+        <!-- Inspiring Visual Side -->
+        <div class="hero-side">
+            <!-- Used a royalty-free generic eco image -->
+            <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=1000&auto=format&fit=crop" alt="Eco-friendly environment" class="hero-img">
+            <div class="hero-content">
+                <h1>Together for a Cleaner Tomorrow.</h1>
+                <p>By verifying your email, you're taking the first step towards a sustainable, zero-waste future. Every action counts.</p>
+            </div>
+        </div>
+
+        <!-- Action Card Side -->
+        <div class="action-side">
+            <div class="blob-1"></div>
+            <div class="blob-2"></div>
+            
+            <div class="glass-card">
+                <div class="icon-container">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <h2>Check Your Inbox</h2>
+                <p>We've sent a magic verification link to your email address. Please click the link to activate your EcoPickup account.</p>
+                
+                <a href="/login.html" class="primary-button">
+                    Return to Login
+                </a>
+
+                <div class="help-text">
+                    Didn't receive the email? <br>
+                    Check your spam folder or <a href="#" id="resend-link">click to resend</a>.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('resend-link').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const link = e.target;
+            const originalText = link.innerText;
+            
+            link.innerText = "Sending...";
+            link.style.pointerEvents = "none";
+            
+            // Assume we can get the email from local storage or ask user if needed. 
+            // In a robust system, we pass it via URL query params ?email=xxx
+            // For now, we simulate success for the UI effect.
+            setTimeout(() => {
+                link.innerText = "Sent! Check inbox.";
+                link.style.color = "#059669";
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

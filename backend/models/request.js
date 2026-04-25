@@ -15,7 +15,24 @@ const requestSchema = new mongoose.Schema(
 
     location: {
       type: String,
-      required: true,
+    },
+
+    pickupType: {
+      type: String,
+      enum: ["home", "nearby"],
+      default: "home",
+    },
+
+    address: {
+      type: String,
+    },
+
+    wasteCategory: {
+      type: String,
+    },
+
+    preferredDate: {
+      type: Date,
     },
 
     imageUrl: {
@@ -30,8 +47,29 @@ const requestSchema = new mongoose.Schema(
     },
 
     assignedWorker: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+
+    workerStatus: {
       type: String,
-      default: "",
+      enum: ["Assigned", "Accepted", "Rejected", "Started", "Completed"],
+    },
+
+    proofImageUrl: {
+      type: String,
+    },
+
+    rejectionReason: {
+      type: String,
+    },
+
+    userRating: {
+      type: Number,
+      min: 1,
+      max: 5,
+      default: null,
     },
   },
   { timestamps: true }

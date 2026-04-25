@@ -31,6 +31,46 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+
+    verificationToken: {
+      type: String,
+    },
+
+    verificationTokenExpiry: {
+      type: Date,
+    },
+
+    // Worker Specific Fields
+    availability: {
+      type: String,
+      enum: ["Available", "Busy", "Offline"],
+      default: "Offline",
+    },
+    
+    assignedArea: {
+      type: String,
+      trim: true,
+    },
+
+    currentTaskCount: {
+      type: Number,
+      default: 0,
+    },
+
+    averageRating: {
+      type: Number,
+      default: 0,
+    },
+
+    totalRatings: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

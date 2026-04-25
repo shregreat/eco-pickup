@@ -11,10 +11,12 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/dashboard.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   </head>
   <body data-role="worker">
     <div class="dashboard-shell">
-      <aside class="dashboard-sidebar">
+      <header class="dashboard-navbar">
         <a class="dashboard-brand" href="/" aria-label="EcoPickup home">
           <span class="dashboard-brand-mark">E</span>
           <div>
@@ -28,16 +30,9 @@
           <a href="#map">Map</a>
           <a href="#history">History</a>
           <a href="#performance">Performance</a>
-          <a href="#notifications">Notifications</a>
-          <a href="#profile">Profile</a>
           <button class="dashboard-logout" id="dashboard-logout" type="button">Logout</button>
         </nav>
-
-        <div class="sidebar-note">
-          <h3>Field Work</h3>
-          <p>Track your assigned stops, route coverage, and shift updates from one worker-focused screen.</p>
-        </div>
-      </aside>
+      </header>
 
       <main class="dashboard-main">
         <header class="dashboard-topbar" id="tasks">
@@ -60,27 +55,27 @@
         <section class="dashboard-section metrics-grid">
           <article class="card metric-card">
             <small>Assigned Tasks</small>
-            <strong>18</strong>
+            <strong id="worker-metric-assigned">0</strong>
             <p>Pickup and cleanup tasks allocated under My Tasks.</p>
-            <div class="metric-bar"><span style="width: 72%"></span></div>
+            <div class="metric-bar"><span id="worker-metric-assigned-bar" style="width: 0%"></span></div>
           </article>
           <article class="card metric-card">
             <small>Completed Today</small>
-            <strong>11</strong>
+            <strong id="worker-metric-completed">0</strong>
             <p>Requests already finished and confirmed during this shift.</p>
-            <div class="metric-bar"><span style="width: 61%"></span></div>
+            <div class="metric-bar"><span id="worker-metric-completed-bar" style="width: 0%"></span></div>
           </article>
           <article class="card metric-card">
             <small>Performance Score</small>
-            <strong>92%</strong>
+            <strong id="worker-metric-performance">0%</strong>
             <p>Optimized travel and service completion score.</p>
-            <div class="metric-bar"><span style="width: 92%"></span></div>
+            <div class="metric-bar"><span id="worker-metric-performance-bar" style="width: 0%"></span></div>
           </article>
           <article class="card metric-card">
             <small>Notifications</small>
-            <strong>4</strong>
+            <strong id="worker-metric-notifications">0</strong>
             <p>Unread shift alerts and supervisor updates.</p>
-            <div class="metric-bar"><span style="width: 48%"></span></div>
+            <div class="metric-bar"><span style="width: 0%"></span></div>
           </article>
         </section>
 
@@ -99,26 +94,12 @@
                   <th>Area</th>
                   <th>Task</th>
                   <th>Status</th>
+                  <th>Action</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="worker-requests-table-body">
                 <tr>
-                  <td>01</td>
-                  <td>Lake Colony</td>
-                  <td>Household pickup</td>
-                  <td><span class="status-pill green">Done</span></td>
-                </tr>
-                <tr>
-                  <td>02</td>
-                  <td>Market Road</td>
-                  <td>Overflow dustbin</td>
-                  <td><span class="status-pill blue">On Route</span></td>
-                </tr>
-                <tr>
-                  <td>03</td>
-                  <td>Sector 11</td>
-                  <td>Bulk collection</td>
-                  <td><span class="status-pill orange">Queued</span></td>
+                  <td colspan="5">Loading tasks...</td>
                 </tr>
               </tbody>
             </table>
@@ -127,55 +108,31 @@
           <article class="card" id="map">
             <div class="section-heading">
               <div>
-                <h2>Map</h2>
-                <p>Shift guidance, route notes, and live area coverage.</p>
+                <h2>Live Routing Map</h2>
+                <p>Location of your currently active task.</p>
               </div>
             </div>
-            <div class="status-list">
-              <article>
-                <strong>Estimated route time</strong>
-                <span>3h 20m remaining across the next 7 stops.</span>
-              </article>
-              <article>
-                <strong>Traffic advisory</strong>
-                <span>Main Street is slow. Use River Link bypass after Stop 4.</span>
-              </article>
-              <article>
-                <strong>Collection priority</strong>
-                <span>Commercial waste pickup at Sector 11 should be completed before 5 PM.</span>
-              </article>
-            </div>
+            <div id="worker-map" style="height: 300px; border-radius: 12px; margin-top: 16px; background-color: var(--dash-surface-hover); border: 1px solid var(--dash-border);"></div>
+            <p id="map-status" style="margin-top: 8px; font-size: 14px; color: var(--dash-muted);">Select a task to view its location.</p>
           </article>
         </section>
 
         <section class="dashboard-section analytics-grid">
-          <article class="card" id="history">
-            <span class="card-eyebrow">History</span>
-            <h3>Completed task load</h3>
-            <div class="chart-bars">
-              <article><span style="height: 42%"></span><small>09 AM</small></article>
-              <article><span style="height: 78%"></span><small>11 AM</small></article>
-              <article><span style="height: 66%"></span><small>01 PM</small></article>
-              <article><span style="height: 38%"></span><small>03 PM</small></article>
-            </div>
-          </article>
-          <article class="card" id="performance">
+          <article class="card full-section" id="leaderboard">
             <span class="card-eyebrow">Performance</span>
-            <h3>Shift review</h3>
-            <div class="activity-list">
-              <article>
-                <strong>Task completion rate</strong>
-                <p>86% of assigned stops were completed within the preferred route window.</p>
-              </article>
-              <article>
-                <strong>Supervisor feedback</strong>
-                <p>Upload proof photos for all bulk pickups before marking them complete.</p>
-              </article>
-              <article>
-                <strong>Efficiency score</strong>
-                <p>Fuel usage and travel timing remained within the expected shift target.</p>
-              </article>
-            </div>
+            <h3>Top Worker Leaderboard</h3>
+            <table class="table-shell" style="margin-top: 16px;">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Worker Name</th>
+                  <th>Completed Pickups</th>
+                </tr>
+              </thead>
+              <tbody id="worker-leaderboard-body">
+                <tr><td colspan="3">Loading leaderboard...</td></tr>
+              </tbody>
+            </table>
           </article>
         </section>
 
@@ -224,6 +181,7 @@
       </main>
     </div>
 
+    <script src="/socket.io/socket.io.js"></script>
     <script src="/dashboard-script.js"></script>
   </body>
 </html>

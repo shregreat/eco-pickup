@@ -14,7 +14,7 @@
   </head>
   <body data-role="admin" data-page="admin-requests">
     <div class="dashboard-shell">
-      <aside class="dashboard-sidebar">
+      <header class="dashboard-navbar">
         <a class="dashboard-brand" href="/" aria-label="EcoPickup home">
           <span class="dashboard-brand-mark">E</span>
           <div>
@@ -27,12 +27,7 @@
           <a class="active" href="/admin/requests/">Requests</a>
           <button class="dashboard-logout" id="dashboard-logout" type="button">Logout</button>
         </nav>
-
-        <div class="sidebar-note">
-          <h3>Request Management</h3>
-          <p>Review all submitted requests from this dedicated admin page.</p>
-        </div>
-      </aside>
+      </header>
 
       <main class="dashboard-main">
         <header class="dashboard-topbar">
@@ -69,6 +64,7 @@
                   <th>Area</th>
                   <th>Status</th>
                   <th>Assigned</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody id="admin-requests-table-body">
@@ -84,6 +80,7 @@
       </main>
     </div>
 
+    <script src="/socket.io/socket.io.js"></script>
     <script src="/request-pages.js"></script>
   </body>
 </html>

@@ -14,7 +14,7 @@
   </head>
   <body data-role="admin">
     <div class="dashboard-shell">
-      <aside class="dashboard-sidebar">
+      <header class="dashboard-navbar">
         <a class="dashboard-brand" href="/" aria-label="EcoPickup home">
           <span class="dashboard-brand-mark">E</span>
           <div>
@@ -27,12 +27,7 @@
           <a href="/admin/requests/">Requests</a>
           <button class="dashboard-logout" id="dashboard-logout" type="button">Logout</button>
         </nav>
-
-        <div class="sidebar-note">
-          <h3>City Operations</h3>
-          <p>Use this control center to review incoming requests, monitor workers, and track cleanup performance across the platform.</p>
-        </div>
-      </aside>
+      </header>
 
       <main class="dashboard-main">
         <header class="dashboard-topbar" id="dashboard">
@@ -60,22 +55,22 @@
             <div class="metric-bar"><span style="width: 82%"></span></div>
           </article>
           <article class="card metric-card">
-            <small>Pending Requests</small>
+            <small>Pending Assignment</small>
             <strong id="admin-pending-requests-count">0</strong>
-            <p>Requests that are waiting for review or assignment.</p>
-            <div class="metric-bar"><span style="width: 68%"></span></div>
+            <p>Requests waiting for worker dispatch.</p>
+            <div class="metric-bar"><span style="width: 25%"></span></div>
           </article>
           <article class="card metric-card">
             <small>In Progress</small>
             <strong id="admin-in-progress-requests-count">0</strong>
-            <p>Requests that are currently being handled.</p>
-            <div class="metric-bar"><span style="width: 74%"></span></div>
+            <p>Active collections currently on route.</p>
+            <div class="metric-bar"><span style="width: 45%"></span></div>
           </article>
           <article class="card metric-card">
-            <small>Completed Requests</small>
+            <small>Completed</small>
             <strong id="admin-completed-requests-count">0</strong>
-            <p>Requests that have already been finished successfully.</p>
-            <div class="metric-bar"><span style="width: 56%"></span></div>
+            <p>Successfully resolved and verified.</p>
+            <div class="metric-bar"><span style="width: 65%"></span></div>
           </article>
         </section>
 
@@ -83,14 +78,17 @@
           <article class="card" id="requests">
             <div class="section-heading">
               <div>
-                <h2>Recent Requests</h2>
-                <p>Open the full admin requests page to review all submitted requests in one place.</p>
+                <h2>Request Management</h2>
+                <p>Track request details, status, and worker assignments from a dedicated page.</p>
               </div>
             </div>
-            <div class="empty-note">
-              Request management is available on a dedicated admin page so the dashboard stays focused on high-level operations.
+            <div class="status-list">
+              <article>
+                <strong>Assign Workers</strong>
+                <span>Easily view available workers and assign them to pending requests.</span>
+              </article>
             </div>
-            <div class="dashboard-action-row">
+            <div class="dashboard-action-row" style="margin-top: 16px;">
               <a class="dashboard-submit-button" href="/admin/requests/">Open Admin Requests Page</a>
             </div>
           </article>
@@ -102,20 +100,21 @@
                 <p>Team movement and route readiness.</p>
               </div>
             </div>
-            <div class="status-list">
-              <article>
-                <strong>Pending queue</strong>
-                <span id="admin-pending-status">Loading pending request status...</span>
-              </article>
-              <article>
-                <strong>Active processing</strong>
-                <span id="admin-in-progress-status">Waiting for in-progress request totals...</span>
-              </article>
-              <article>
-                <strong>Completed work</strong>
-                <span id="admin-completed-status">Loading completed request totals...</span>
-              </article>
-            </div>
+            <table class="table-shell">
+              <thead>
+                <tr>
+                  <th>Worker Name</th>
+                  <th>Availability</th>
+                  <th>Assigned Tasks</th>
+                  <th>Completed Pickups</th>
+                </tr>
+              </thead>
+              <tbody id="admin-workers-table-body">
+                <tr>
+                  <td colspan="3">Loading active workers...</td>
+                </tr>
+              </tbody>
+            </table>
           </article>
         </section>
 
@@ -130,32 +129,70 @@
               <article><span style="height: 54%"></span><small>West</small></article>
             </div>
           </article>
-          <article class="card">
-            <span class="card-eyebrow">Reports</span>
-            <h3>Administrative actions</h3>
-            <div class="mini-stat-list">
-              <article id="users">
-                <strong>Total request load</strong>
-                <p id="admin-total-requests-text">Loading request volume summary...</p>
-              </article>
-              <article id="rewards">
-                <strong>Pending summary</strong>
-                <p id="admin-pending-requests-text">Loading pending request summary...</p>
-              </article>
-              <article id="reports">
-                <strong>Completion summary</strong>
-                <p id="admin-completed-requests-text">Loading completed request summary...</p>
-              </article>
-              <article id="settings">
-                <strong>Platform settings</strong>
-                <p id="admin-settings-text">Dispatch hours, route zones, and alert thresholds can be reviewed from this admin overview.</p>
-              </article>
+
+          <article class="card" id="create-worker">
+            <div class="section-heading">
+              <div>
+                <h2>Create New Worker</h2>
+                <p>Register a new worker account for field operations.</p>
+              </div>
             </div>
+            <form id="create-worker-form" class="dashboard-form">
+              <div>
+                <label for="worker-name">Full Name</label>
+                <input type="text" id="worker-name" required placeholder="e.g. John Doe">
+              </div>
+              <div>
+                <label for="worker-email">Email Address</label>
+                <input type="email" id="worker-email" required placeholder="worker@ecopickup.com">
+              </div>
+              <div>
+                <label for="worker-password">Temporary Password</label>
+                <input type="password" id="worker-password" required placeholder="Enter password">
+              </div>
+              <button type="submit" class="dashboard-submit-button">Create Worker</button>
+              <p id="worker-form-status" class="form-status"></p>
+            </form>
+          </article>
+        </section>
+
+        <section class="dashboard-section content-grid">
+          <article class="card">
+            <span class="card-eyebrow">Top Performers</span>
+            <h3>Top Workers</h3>
+            <table class="table-shell" style="margin-top: 16px;">
+              <thead>
+                <tr>
+                  <th>Worker Name</th>
+                  <th>Completed Pickups</th>
+                </tr>
+              </thead>
+              <tbody id="admin-top-workers-body">
+                <tr><td colspan="2">Loading...</td></tr>
+              </tbody>
+            </table>
+          </article>
+
+          <article class="card">
+            <span class="card-eyebrow">Top Citizens</span>
+            <h3>Eco-Citizen Leaderboard</h3>
+            <table class="table-shell" style="margin-top: 16px;">
+              <thead>
+                <tr>
+                  <th>Citizen Name</th>
+                  <th>Eco Points</th>
+                </tr>
+              </thead>
+              <tbody id="admin-top-users-body">
+                <tr><td colspan="2">Loading...</td></tr>
+              </tbody>
+            </table>
           </article>
         </section>
       </main>
     </div>
 
+    <script src="/socket.io/socket.io.js"></script>
     <script src="/dashboard-script.js"></script>
   </body>
 </html>

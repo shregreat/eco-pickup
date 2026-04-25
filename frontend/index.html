@@ -21,6 +21,7 @@
       crossorigin=""
     />
     <link rel="stylesheet" href="./style.css" />
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
   </head>
   <body>
     <header class="site-header">
@@ -50,6 +51,7 @@
           <a href="#rewards">Rewards</a>
           <a href="#about">About</a>
           <a href="#contact">Contact</a>
+          <button id="theme-toggle" class="ghost-button" aria-label="Toggle Dark Mode" style="padding: 8px 12px; margin-right: 10px;">🌙</button>
           <a href="./login.html">Login</a>
           <a class="nav-button" href="./login.html#signup-form">Register</a>
         </div>
@@ -136,6 +138,51 @@
         </div>
       </section>
 
+      <!-- Inspiring Mission Cards Section -->
+      <section class="section video-section" style="background: var(--surface-soft); padding: 80px 0; text-align: center;">
+        <div class="container">
+          <div class="section-heading reveal" style="max-width: 800px; margin: 0 auto 40px;">
+            <p class="section-tag" style="color: var(--primary); font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">Our Mission</p>
+            <h2 style="font-size: 2.5rem; margin-top: 10px; color: var(--text);">See the Impact of Recycling</h2>
+            <p style="color: var(--text-muted); margin-top: 15px; font-size: 1.1rem;">Every small action contributes to a greener planet. Explore how communities are transforming waste into a sustainable future.</p>
+          </div>
+          
+          <div class="mission-cards-container reveal" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-top: 40px; text-align: left;">
+            <div class="mission-card" style="background: var(--surface); padding: 15px; border-radius: 24px; box-shadow: var(--shadow-sm); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease; cursor: pointer; border: 1px solid transparent;">
+              <div style="overflow: hidden; border-radius: 16px;">
+                <img src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=600&q=80" alt="Recycling Bin" style="width: 100%; height: 220px; object-fit: cover; transition: transform 0.6s ease;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+              </div>
+              <h3 style="margin: 20px 0 10px; color: var(--text); font-size: 1.5rem;">Smart Sorting</h3>
+              <p style="color: var(--text-muted);">Implement intelligent waste separation at the source for maximum recycling efficiency.</p>
+            </div>
+            
+            <div class="mission-card" style="background: var(--surface); padding: 15px; border-radius: 24px; box-shadow: var(--shadow-sm); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease; cursor: pointer; border: 1px solid transparent;">
+              <div style="overflow: hidden; border-radius: 16px;">
+                <img src="https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=600&q=80" alt="Clean City" style="width: 100%; height: 220px; object-fit: cover; transition: transform 0.6s ease;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+              </div>
+              <h3 style="margin: 20px 0 10px; color: var(--text); font-size: 1.5rem;">Clean Streets</h3>
+              <p style="color: var(--text-muted);">Empowering communities to maintain spotless neighborhoods through quick reporting.</p>
+            </div>
+
+            <div class="mission-card" style="background: var(--surface); padding: 15px; border-radius: 24px; box-shadow: var(--shadow-sm); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease; cursor: pointer; border: 1px solid transparent;">
+              <div style="overflow: hidden; border-radius: 16px;">
+                <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=600&q=80" alt="Green Energy" style="width: 100%; height: 220px; object-fit: cover; transition: transform 0.6s ease;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+              </div>
+              <h3 style="margin: 20px 0 10px; color: var(--text); font-size: 1.5rem;">Sustainable Future</h3>
+              <p style="color: var(--text-muted);">Converting processed waste into renewable resources for a circular economy.</p>
+            </div>
+          </div>
+
+          <style>
+            .mission-card:hover {
+              transform: translateY(-15px) !important;
+              box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.25) !important;
+              border: 1px solid rgba(16, 185, 129, 0.3) !important;
+            }
+          </style>
+        </div>
+      </section>
+
       <section class="section services-section" id="services">
         <div class="container">
           <div class="section-heading reveal">
@@ -143,23 +190,35 @@
             <h2>Everything needed for smart city waste operations</h2>
           </div>
           <div class="card-grid service-grid">
-            <article class="info-card reveal">
-              <div class="card-icon">01</div>
+            <style>
+              .animated-icon {
+                animation: icon-bounce 2s infinite ease-in-out;
+                background: var(--primary);
+                color: white;
+                box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+              }
+              @keyframes icon-bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-8px); }
+              }
+            </style>
+            <article class="info-card reveal" style="text-align: center;">
+              <div class="card-icon animated-icon">01</div>
               <h3>Home Waste Pickup</h3>
               <p>Schedule doorstep collection for regular household waste.</p>
             </article>
-            <article class="info-card reveal">
-              <div class="card-icon">02</div>
+            <article class="info-card reveal" style="text-align: center;">
+              <div class="card-icon animated-icon">02</div>
               <h3>Report Garbage Location</h3>
               <p>Raise alerts for open dumping spots and unattended garbage.</p>
             </article>
-            <article class="info-card reveal">
-              <div class="card-icon">03</div>
+            <article class="info-card reveal" style="text-align: center;">
+              <div class="card-icon animated-icon">03</div>
               <h3>Recycling Program</h3>
               <p>Join recycling drives and support responsible waste sorting.</p>
             </article>
-            <article class="info-card reveal" id="track">
-              <div class="card-icon">04</div>
+            <article class="info-card reveal" id="track" style="text-align: center;">
+              <div class="card-icon animated-icon">04</div>
               <h3>Track Pickup Status</h3>
               <p>Follow your request progress from booking to completion.</p>
             </article>
@@ -375,5 +434,26 @@
       crossorigin=""
     ></script>
     <script src="./script.js"></script>
+    <script>
+      // Dark Mode Toggle Logic
+      const themeToggleBtn = document.getElementById('theme-toggle');
+      const currentTheme = localStorage.getItem('theme');
+      if (currentTheme) {
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        themeToggleBtn.innerText = currentTheme === 'dark' ? '☀️' : '🌙';
+      }
+      themeToggleBtn.addEventListener('click', () => {
+        let theme = document.documentElement.getAttribute('data-theme');
+        if (theme === 'dark') {
+          document.documentElement.removeAttribute('data-theme');
+          localStorage.setItem('theme', 'light');
+          themeToggleBtn.innerText = '🌙';
+        } else {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          localStorage.setItem('theme', 'dark');
+          themeToggleBtn.innerText = '☀️';
+        }
+      });
+    </script>
   </body>
 </html>
