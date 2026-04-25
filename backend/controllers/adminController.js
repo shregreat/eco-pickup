@@ -80,6 +80,13 @@ const assignWorker = async (req, res) => {
     request.workerStatus = "Assigned";
     await request.save();
 
+    // Update worker profile
+    const workerProfile = await WorkerProfile.findOne({ userId: worker._id });
+    if (workerProfile) {
+      workerProfile.currentTaskCount += 1;
+      await workerProfile.save();
+    }
+
     const io = req.app.get("io");
     if (io) {
       io.emit("notification", { message: `You have been assigned a new pickup task in ${request.location || 'your area'}.`, userId: worker._id });

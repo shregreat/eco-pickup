@@ -49,6 +49,15 @@ const updateTaskStatus = async (req, res) => {
 
     await request.save();
 
+    // Update worker profile task count if task is no longer in progress
+    if (workerStatus === "Completed" || workerStatus === "Rejected") {
+      const workerProfile = await WorkerProfile.findOne({ userId: req.user.id });
+      if (workerProfile && workerProfile.currentTaskCount > 0) {
+        workerProfile.currentTaskCount -= 1;
+        await workerProfile.save();
+      }
+    }
+
     // Emit Socket Notification
     const io = req.app.get("io");
     if (io) {
