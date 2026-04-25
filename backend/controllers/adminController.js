@@ -154,8 +154,13 @@ const createWorker = async (req, res) => {
       role: "worker",
       isVerified: false, // Worker must verify their email
       verificationToken,
-      verificationTokenExpiry,
-      availability: "Available"
+      verificationTokenExpiry
+    });
+
+    // Create the worker profile since they were just added by the admin
+    await WorkerProfile.create({ 
+      userId: newWorker._id,
+      availability: "Available" 
     });
 
     try {
